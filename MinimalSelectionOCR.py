@@ -37,7 +37,7 @@ class MinimalOCR():
         
         self.bbox = get_bbox(self.point1, self.point2)
         
-        for i in range(60):
+        while True:
             self.update()
             time.sleep(1)
     

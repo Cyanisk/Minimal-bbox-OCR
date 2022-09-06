@@ -1,11 +1,13 @@
 import pytesseract
 from PIL import ImageGrab
 from pynput import mouse
+import pyperclip
 import time
 
 # Requires
 # - Tesseract (sudo apt install tesseract-ocr)
 # - Tesseract training data (from website)
+# - xclip (sudo apt install xclip)
 
 
 def get_bbox(point1, point2):
@@ -49,7 +51,7 @@ class MinimalOCR():
     def update(self):
         text = perform_ocr(self.bbox, self.config, self.lang)
         if text != self.current_text:
-            print(text)
+            pyperclip.copy(text)
             self.current_text = text
 
 

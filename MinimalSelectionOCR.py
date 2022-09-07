@@ -3,11 +3,10 @@ import pytesseract
 from PIL import ImageGrab
 from pynput import mouse
 import pyperclip
-import time
 
 from MainWindow import Ui_MainWindow
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
 
 # Requires
 # - Tesseract (sudo apt install tesseract-ocr)
@@ -15,9 +14,7 @@ from PyQt5.QtCore import QTimer
 # - xclip (sudo apt install xclip)
 
 #TODO: Can we visualize the bbox?
-#TODO: Paste text to a textfield
-#TODO: Make user able to edit textfield and overwrite clipboard
-#TODO: For multi line results, perhaps copy one line to clipboard at a time
+#TODO: Would be cool to make it a webapp instead
 
 
 def get_bbox(point1, point2):
@@ -36,9 +33,7 @@ class MinimalOCR(QMainWindow):
     point1 = None
     point2 = None
     bbox = None
-    is_auto_mode = True
     is_using_clipboard = True
-    current_text = ''
     config = r'-c preserve_interword_spaces=1 --psm 4'
     lang = 'jpn'
     
@@ -49,12 +44,15 @@ class MinimalOCR(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowTitle('Minimal-bbox-OCR')
+        self.ui.textEdit_result.setAlignment(Qt.AlignVCenter)
         
         # Setup events
         self.ui.radioButton_auto.toggled.connect(self.change_scanning_mode)
         self.ui.checkBox_clipboard.stateChanged.connect(self.toggle_clipboard)
         self.ui.pushButton_selectArea.clicked.connect(self.select_area)
+        self.ui.pushButton_overwrite.clicked.connect(self.overwrite)
         self.ui.pushButton_scan.clicked.connect(self.scan)
+        self.ui.textEdit_result.textChanged.connect(self.begin_text_edit)
         
         # Setup QTimer
         self.timer = QTimer()
@@ -77,6 +75,14 @@ class MinimalOCR(QMainWindow):
         
         QTimer.singleShot(10, self.start_mouse_listener)
     
+    def overwrite(self):
+        text = self.ui.textEdit_result.toPlainText()
+        pyperclip.copy(text)
+    
+    def begin_text_edit(self):
+        if self.ui.textEdit_result.hasFocus():
+            self.ui.radioButton_manu.setChecked(True)
+    
     def start_mouse_listener(self):
         # Listen to the mouse in order to define the bounding box
         with mouse.Listener(on_click = self.on_click) as listener:
@@ -98,17 +104,16 @@ class MinimalOCR(QMainWindow):
         if self.bbox != None:
             text = perform_ocr(self.bbox, self.config, self.lang)
             
-            if self.is_auto_mode & (text == self.current_text):
+            if text == self.ui.textEdit_result.toPlainText():
                 return
             
-            self.current_text = text
+            self.ui.textEdit_result.setPlainText(text)
             
             if self.is_using_clipboard:
                 pyperclip.copy(text)
     
     def closeEvent(self, event):
         self.timer.stop()
-        print('closing')
         event.accept()
 
 if __name__ == '__main__':

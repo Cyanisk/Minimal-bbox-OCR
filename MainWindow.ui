@@ -122,9 +122,22 @@ to clipboard</string>
          </widget>
         </item>
         <item>
-         <widget class="Line" name="line_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+         <widget class="QPushButton" name="pushButton_overwrite">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Overwrite
+ clipboard</string>
           </property>
          </widget>
         </item>
@@ -147,7 +160,11 @@ to clipboard</string>
        </layout>
       </item>
       <item>
-       <widget class="QTextBrowser" name="textBrowser_result"/>
+       <widget class="QTextEdit" name="textEdit_result">
+        <property name="placeholderText">
+         <string>The current result will be displayed here. If the result has wrong characters you can edit the result here and use [Overwrite clipboard] to copy the fixed result to clipboard.  When editing the result, the program switches to Manual Mode so changes don't get overwritten.  </string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

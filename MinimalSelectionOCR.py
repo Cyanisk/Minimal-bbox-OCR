@@ -1,27 +1,31 @@
 import sys
 import pytesseract
 from PIL import ImageGrab
-from pynput import mouse
 import pyperclip
 
 from MainWindow import Ui_MainWindow
+from AreaSelectTool import AreaSelectTool
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtGui import QGuiApplication
 
 # Requires
 # - Tesseract (sudo apt install tesseract-ocr)
 # - Tesseract training data (from website)
 # - xclip (sudo apt install xclip)
 
-#TODO: Can we visualize the bbox?
+#TODO: Write bigger text on QSplashScreen
+#TODO: Return to auto mode when focus is lost from textarea?
 #TODO: Would be cool to make it a webapp instead
+#TODO: Pause scanning loop when selecting
+#TODO: Write README
 
 
 def get_bbox(point1, point2):
-    x1 = min(point1[0], point2[0])
-    y1 = min(point1[1], point2[1])
-    x2 = max(point1[0], point2[0])
-    y2 = max(point1[1], point2[1])
+    x1 = min(point1.x(), point2.x())
+    y1 = min(point1.y(), point2.y())
+    x2 = max(point1.x(), point2.x())
+    y2 = max(point1.y(), point2.y())
     return (x1,y1,x2,y2)
 
 def perform_ocr(bbox, config, lang):
@@ -30,8 +34,7 @@ def perform_ocr(bbox, config, lang):
 
 class MinimalOCR(QMainWindow):
     
-    point1 = None
-    point2 = None
+    screen_idx = 0
     bbox = None
     is_using_clipboard = True
     config = r'-c preserve_interword_spaces=1 --psm 4'
@@ -73,7 +76,11 @@ class MinimalOCR(QMainWindow):
     def select_area(self):
         self.ui.label_status.setText('Drag the mouse to select an area to scan')
         
-        QTimer.singleShot(10, self.start_mouse_listener)
+        self.splash = AreaSelectTool(self.screen_idx)
+        self.splash.gotResult.connect(self.processAreaSelectResult)
+        self.hide()
+        self.splash.show()
+        self.splash.activateWindow()
     
     def overwrite(self):
         text = self.ui.textEdit_result.toPlainText()
@@ -83,22 +90,23 @@ class MinimalOCR(QMainWindow):
         if self.ui.textEdit_result.hasFocus():
             self.ui.radioButton_manu.setChecked(True)
     
-    def start_mouse_listener(self):
-        # Listen to the mouse in order to define the bounding box
-        with mouse.Listener(on_click = self.on_click) as listener:
-            listener.join()
-        self.bbox = get_bbox(self.point1, self.point2)
+    def processAreaSelectResult(self, result):
+        self.splash.hide()
+        self.show()
+        point1 = self.splash.globalPos1
+        point2 = self.splash.globalPos2
+        self.splash.deleteLater()
         
-        if self.ui.radioButton_manu.isChecked():
-            self.ui.pushButton_scan.setEnabled(True)
-        self.ui.label_status.setText('Scan result:')  
-    
-    def on_click(self, x, y, button, pressed):
-        if pressed:
-            self.point1 = (x,y)
-        else:
-            self.point2 = (x,y)
-            return False
+        if result == 0:
+            self.bbox = get_bbox(point1, point2)
+            
+            if self.ui.radioButton_manu.isChecked():
+                self.ui.pushButton_scan.setEnabled(True)
+            self.ui.label_status.setText('Scan result:')
+        elif (result == -1) | (result == 1):
+            n_screens = len(QGuiApplication.screens())
+            self.screen_idx = (self.screen_idx + result) % n_screens
+            self.select_area()
         
     def scan(self):
         if self.bbox != None:

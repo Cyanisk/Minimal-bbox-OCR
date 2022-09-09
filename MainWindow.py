@@ -71,6 +71,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.pushButton_scan)
         self.horizontalLayout_2.addLayout(self.verticalLayout_2)
         self.textEdit_result = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit_result.setEnabled(True)
         self.textEdit_result.setObjectName("textEdit_result")
         self.horizontalLayout_2.addWidget(self.textEdit_result)
         self.verticalLayout.addLayout(self.horizontalLayout_2)

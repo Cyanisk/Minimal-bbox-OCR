@@ -164,6 +164,11 @@ to clipboard</string>
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
         <property name="placeholderText">
          <string>The current result will be displayed here. If the result has wrong characters you can edit the result here and use [Overwrite clipboard] to copy the fixed result to clipboard.  When editing the result, the program switches to Manual Mode so changes don't get overwritten.  </string>
         </property>

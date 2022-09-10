@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QSplashScreen, QRubberBand
+from PyQt5.QtWidgets import QSplashScreen, QLabel, QRubberBand
 from PyQt5.QtCore import Qt, QRect, QSize, pyqtSignal, QPoint
-from PyQt5.QtGui import QPixmap, QGuiApplication
+from PyQt5.QtGui import QPixmap, QGuiApplication, QFont
 
 class AreaSelectTool(QSplashScreen):
     
@@ -9,6 +9,7 @@ class AreaSelectTool(QSplashScreen):
     localPos = None
     globalPos1 = None
     globalPos2 = None
+    rubberband = None
     selection_started = False
     
     def __init__(self, screen_idx):
@@ -23,10 +24,17 @@ class AreaSelectTool(QSplashScreen):
         super().__init__(screen, pixmap)
         self.setWindowState(Qt.WindowFullScreen)
         self.setWindowOpacity(0.5)
+        
+        # Show help text
         message = 'Drag with left mouse button to select an area\n' +\
             'Press Right or Left key to change screen\n' +\
             'Press Esc key to return'
-        self.showMessage(message, alignment=Qt.AlignCenter, color=Qt.white)
+        self.label = QLabel(message, self)
+        self.label.setMaximumSize(size)
+        self.label.setMinimumSize(size)
+        self.label.setFont(QFont('Fira Sans Semi-Light', 15))
+        self.label.setStyleSheet('color: white')
+        self.label.setAlignment(Qt.AlignCenter)
         
         # Define the selection box
         self.rubberband = QRubberBand(QRubberBand.Rectangle, self)

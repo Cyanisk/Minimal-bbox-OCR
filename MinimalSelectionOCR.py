@@ -14,10 +14,10 @@ from PyQt5.QtGui import QGuiApplication
 # - Tesseract training data (from website)
 # - xclip (sudo apt install xclip)
 
-#TODO: Write bigger text on QSplashScreen
 #TODO: Return to auto mode when focus is lost from textarea?
 #TODO: Would be cool to make it a webapp instead
 #TODO: Pause scanning loop when selecting
+#TODO: Fix some text on the main window
 #TODO: Write README
 
 

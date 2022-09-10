@@ -9,16 +9,11 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QGuiApplication
 
-# Requires
-# - Tesseract (sudo apt install tesseract-ocr)
-# - Tesseract training data (from website)
-# - xclip (sudo apt install xclip)
-
 #TODO: Return to auto mode when focus is lost from textarea?
+#TODO: Consider making a shortcut to change つ to っ
 #TODO: Would be cool to make it a webapp instead
 #TODO: Pause scanning loop when selecting
 #TODO: Fix some text on the main window
-#TODO: Write README
 
 
 def get_bbox(point1, point2):
